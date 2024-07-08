@@ -1,0 +1,32 @@
+{
+  "name": "alpine-animation",
+  "version": "0.0.1",
+  "description": "A plugin for Alpine.js that seamlessly integrates the AutoAnimate library for effortless animations.",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "node ./scripts/build.js",
+    "watch": "node ./scripts/build.js --watch",
+    "lint": "eslint .",
+    "lint-fix": "eslint . --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CharrafiMed/alpinejs-animation.git"
+  },
+  "keywords": [
+    "alpinejs",
+    "animations",
+    "auto-animate"
+  ],
+  "author": "@charrafimed",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CharrafiMed/alpinejs-animation/issues"
+  },
+  "homepage": "https://github.com/CharrafiMed/alpinejs-animation#readme",
+  "dependencies": {
+    "@formkit/auto-animate": "^0.8.2"
+  },
+  "devDependencies": {
+  }
+}
