@@ -1,5 +1,5 @@
 {
-  "name": "alpine-animation",
+  "name": "@charrafimed/alpine-animation",
   "version": "0.0.1",
   "description": "A plugin for Alpine.js that seamlessly integrates the AutoAnimate library for effortless animations.",
   "main": "src/index.js",
