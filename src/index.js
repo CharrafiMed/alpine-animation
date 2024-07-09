@@ -3,13 +3,11 @@ import autoAnimate from "@formkit/auto-animate";
 export default (Alpine) => {
   Alpine.directive(
     "animate",
-    (el, { value, modifiers, expression }, { Alpine, effect, cleanup }) => {
-      console.log(modifiers);
-      console.log(expression);
-      console.log(Alpine);
-      console.log(effect);
-      console.log(cleanup);
-      console.log(value);
+    (
+      el,
+      { value, modifiers, expression },
+      { Alpine, effect, evaluate, evaluateLater, cleanup }
+    ) => {
 
       let configs = {};
       // handling the duration modifier
@@ -26,7 +24,6 @@ export default (Alpine) => {
 
           configs.duration =
             durationUnit === "s" ? durationNumber * 1000 : durationNumber;
-          console.log(configs);
         } else {
           console.warn(
             "Invalid duration format. Use digits followed by 'ms' or 's'."
@@ -45,7 +42,7 @@ export default (Alpine) => {
               'The "easing" modifier was specified without a value.'
             );
       }
-
+      //  handling the disrespectUserMotionPreference modifier
       if (modifiers.includes("disrespectusermotionpreference")) {
         const userMotionPrefValue =
           modifiers[modifiers.indexOf("disrespectusermotionpreference") + 1];
@@ -53,16 +50,10 @@ export default (Alpine) => {
           ? true
           : false;
       }
-      // grap the duration modifier
-
-      // grap the ease modifier
-
-      // grap the disrespectUserMotionPreference
-
-      // or evaluate the passed object instead eg: { duration:300, ease:linear, disrespectUserMotionPreference}
-
-      // initialize autoAnimate(el,{configs}) and pass to it the params
-      console.log(configs);
+      if (String(expression).length) {
+        configs = { ...configs,...evaluate(expression) };
+      }
+       autoAnimate(el,configs);
     }
   );
 };
