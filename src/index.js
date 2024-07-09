@@ -12,16 +12,20 @@ export default (Alpine) => {
       console.log(value);
 
       let configs = {};
-
-      // check for modifiers
-      if (modifiers.includes("easing")) {
-        console.log("easing exists");
-        keyIndex = modifiers.indexOf("easing");
-        valueIndex = modifiers[keyIndex + 1];
-      }
+      // handling the duration modifier
       if (modifiers.includes("duration")) {
         console.log("duration exists");
       }
+      // handling the easing modifier
+      if (modifiers.includes("easing")) {
+        const easingValue = modifiers[modifiers.indexOf("easing") + 1];
+        easingValue
+          ? (configs.easing = easingValue)
+          : console.warn(
+              'The "easing" modifier was specified without a value.'
+            );
+      }
+
       if (modifiers.includes("disrespectusermotionpreference")) {
         console.log("disrespectUserMotionPreference exists");
       }
