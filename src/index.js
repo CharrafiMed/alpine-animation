@@ -8,13 +8,13 @@ export default (Alpine) => {
       { value, modifiers, expression },
       { Alpine, effect, evaluate, evaluateLater, cleanup }
     ) => {
-
       let configs = {};
       // handling the duration modifier
       if (modifiers.includes("duration")) {
         const durationIndex = modifiers.indexOf("duration");
         const durationValue = modifiers[durationIndex + 1];
         const durationRegex = /^(\d+)(ms|s)?$/;
+
         if (durationRegex.test(durationValue)) {
           const match = durationRegex.exec(durationValue);
           const durationNumber = parseInt(match[1], 10);
@@ -50,10 +50,12 @@ export default (Alpine) => {
           ? true
           : false;
       }
+
       if (String(expression).length) {
-        configs = { ...configs,...evaluate(expression) };
+        configs = { ...configs, ...evaluate(expression) };
       }
-       autoAnimate(el,configs);
+
+      autoAnimate(el, configs);
     }
   );
 };
