@@ -1,6 +1,6 @@
 {
   "name": "@charrafimed/alpine-animation",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A plugin for Alpine.js that seamlessly integrates the AutoAnimate library for effortless animations.",
   "main": "dist/module.cjs.js",
   "module": "dist/module.esm.js",
