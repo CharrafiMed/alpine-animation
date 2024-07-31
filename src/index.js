@@ -29,8 +29,6 @@ export default (Alpine) => {
             "Invalid duration format. Use digits followed by 'ms' or 's'."
           );
         }
-      } else {
-        console.warn('The "duration" modifier was specified without a value.');
       }
 
       // handling the easing modifier
