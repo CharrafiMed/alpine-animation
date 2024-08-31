@@ -485,8 +485,6 @@ var src_default = (Alpine) => {
       } else {
         console.warn("Invalid duration format. Use digits followed by 'ms' or 's'.");
       }
-    } else {
-      console.warn('The "duration" modifier was specified without a value.');
     }
     if (modifiers.includes("easing")) {
       const easingValue = modifiers[modifiers.indexOf("easing") + 1];
