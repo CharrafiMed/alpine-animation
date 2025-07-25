@@ -2,16 +2,7 @@
 
 A seamless Alpine.js plugin that brings smooth animations to your DOM changes using the powerful [AutoAnimate](https://auto-animate.formkit.com/) library under the hood.
 
-Perfect for animating list changes, table updates, card shuffles, and any dynamic content that gets added, removed, or reordered.
-
-## ✨ Features
-
-- **Zero Configuration** - Works out of the box with sensible defaults
-- **Multiple Configuration Methods** - Use modifiers, objects, or global settings
-- **Global Configuration** - Set defaults for your entire application
-- **Method Chaining** - Fluent API for easy setup
-- **TypeScript Ready** - Full type support (when available)
-- **Lightweight** - Minimal overhead, maximum performance
+Perfect for animating list changes, table updates, and any dynamic content that gets added, removed, or reordered.
 
 ## 📦 Installation
 
@@ -49,7 +40,7 @@ Alpine.plugin(AlpineAnimation)
 Alpine.start()
 ```
 
-## 🚀 Quick Start
+##  Quick Start
 
 Add the `x-animate` directive to any container, and watch the magic happen:
 
@@ -64,7 +55,7 @@ Add the `x-animate` directive to any container, and watch the magic happen:
 
 **That's it!** Items will now animate smoothly when added, removed, or reordered.
 
-## ⚙️ Configuration Options
+##  Configuration Options
 
 ### Using Modifiers
 
@@ -118,7 +109,7 @@ Disable animations conditionally:
 </div>
 ```
 
-## 🌐 Global Configuration
+##  Global Configuration
 
 Set default configuration for all animations in your application:
 
@@ -165,7 +156,7 @@ Settings are applied in this order (highest to lowest priority):
 3. **Global configuration**: `AlpineAnimation.customize()`
 4. **Default values**: Built-in defaults
 
-## 📋 Configuration Reference
+##  Configuration Reference
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -184,7 +175,7 @@ Common easing values you can use:
 - `'ease-in-out'` - Slow start and end
 - `'cubic-bezier(0.4, 0, 0.2, 1)'` - Custom cubic bezier
 
-## 💡 Usage Examples
+## Usage Examples
 
 ### Todo List
 
@@ -234,7 +225,7 @@ Common easing values you can use:
 </table>
 ```
 
-## 🎛️ Advanced Usage
+## Advanced Usage
 
 ### Multiple Animation Containers
 
@@ -282,7 +273,7 @@ const themes = {
 AlpineAnimation.customize(themes.smooth)
 ```
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Common Gotchas
 
