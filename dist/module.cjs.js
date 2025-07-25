@@ -482,37 +482,108 @@ function autoAnimate(el, config = {}) {
   });
 }
 
+// src/utils.js
+function parseModifier(modifiers) {
+  let duration = 300, easing = "ease-in-out", disrespectUserMotionPreference = false;
+  if (modifiers.includes("duration")) {
+    const durationIndex = modifiers.indexOf("duration");
+    const durationValue = modifiers[durationIndex + 1];
+    const durationRegex = /^(\d+)(ms|s)?$/;
+    if (!durationRegex.test(durationValue)) {
+      console.warn("The 'duration' modifier was specified without a valid value.");
+    } else {
+      const match = durationRegex.exec(durationValue);
+      const durationNumber = parseInt(match[1], 10);
+      const durationUnit = match[2] || "ms";
+      duration = durationUnit === "s" ? durationNumber * 1e3 : durationNumber;
+    }
+  }
+  if (modifiers.includes("easing")) {
+    const easingValue = modifiers[modifiers.indexOf("easing") + 1];
+    easingValue ? easing = easingValue : console.warn("The 'easing' modifier was specified without a value.");
+  }
+  if (modifiers.includes("disrespectusermotionpreference")) {
+    const userMotionPrefValue = modifiers[modifiers.indexOf("disrespectusermotionpreference") + 1];
+    disrespectUserMotionPreference = userMotionPrefValue ? true : false;
+  }
+  return {
+    duration,
+    easing,
+    disrespectUserMotionPreference
+  };
+}
+
 // src/index.js
-var src_default = (Alpine) => {
-  Alpine.directive("animate", (el, {value, modifiers, expression}, {Alpine: Alpine2, effect, evaluate, evaluateLater, cleanup}) => {
-    let configs = {};
-    if (modifiers.includes("duration")) {
-      const durationIndex = modifiers.indexOf("duration");
-      const durationValue = modifiers[durationIndex + 1];
-      const durationRegex = /^(\d+)(ms|s)?$/;
-      if (durationRegex.test(durationValue)) {
-        const match = durationRegex.exec(durationValue);
-        const durationNumber = parseInt(match[1], 10);
-        const durationUnit = match[2] || "ms";
-        configs.duration = durationUnit === "s" ? durationNumber * 1e3 : durationNumber;
-      } else {
-        console.warn("Invalid duration format. Use digits followed by 'ms' or 's'.");
-      }
-    }
-    if (modifiers.includes("easing")) {
-      const easingValue = modifiers[modifiers.indexOf("easing") + 1];
-      easingValue ? configs.easing = easingValue : console.warn('The "easing" modifier was specified without a value.');
-    }
-    if (modifiers.includes("disrespectusermotionpreference")) {
-      const userMotionPrefValue = modifiers[modifiers.indexOf("disrespectusermotionpreference") + 1];
-      configs.disrespectUserMotionPreference = userMotionPrefValue ? true : false;
-    }
-    if (String(expression).length) {
-      configs = {...configs, ...evaluate(expression)};
-    }
-    autoAnimate(el, configs);
-  });
+var globalConfig = {
+  duration: 300,
+  easing: "ease-in-out",
+  disrespectUserMotionPreference: false
 };
+function AlpineAnimation(Alpine) {
+  Alpine.directive("animate", (el, {modifiers, expression}, {evaluate, cleanup}) => {
+    try {
+      let config = {...globalConfig};
+      const modifierConfig = parseModifier(modifiers);
+      config = {...config, ...modifierConfig};
+      if (expression == null ? void 0 : expression.length) {
+        const evaluated = evaluate(expression);
+        if (typeof evaluated === "object" && evaluated !== null) {
+          config = {...config, ...evaluated};
+        } else if (evaluated === false) {
+          return;
+        }
+      }
+      console.log("hiba");
+      const autoAnimateInstance = autoAnimate(el, config);
+    } catch (error) {
+      console.error("[Alpine Animation] Failed to initialize:", error);
+    }
+  });
+}
+AlpineAnimation.customize = function(userConfig) {
+  if (typeof userConfig !== "object" || userConfig === null) {
+    console.warn("[Alpine Animation] customize() expects an object");
+    return AlpineAnimation;
+  }
+  const validKeys = ["duration", "easing", "disrespectUserMotionPreference"];
+  const validConfig = {};
+  Object.keys(userConfig).forEach((key) => {
+    if (validKeys.includes(key)) {
+      validConfig[key] = userConfig[key];
+    } else {
+      console.warn(`[Alpine Animation] Unknown configuration key: "${key}"`);
+    }
+  });
+  if (validConfig.duration !== void 0) {
+    if (typeof validConfig.duration !== "number" || validConfig.duration < 0) {
+      console.warn("[Alpine Animation] duration must be a non-negative number");
+      delete validConfig.duration;
+    }
+  }
+  if (validConfig.easing !== void 0) {
+    if (typeof validConfig.easing !== "string") {
+      console.warn("[Alpine Animation] easing must be a string");
+      delete validConfig.easing;
+    }
+  }
+  if (validConfig.disrespectUserMotionPreference !== void 0) {
+    validConfig.disrespectUserMotionPreference = Boolean(validConfig.disrespectUserMotionPreference);
+  }
+  globalConfig = {...globalConfig, ...validConfig};
+  return AlpineAnimation;
+};
+AlpineAnimation.getConfig = function() {
+  return {...globalConfig};
+};
+AlpineAnimation.reset = function() {
+  globalConfig = {
+    duration: 300,
+    easing: "ease-in-out",
+    disrespectUserMotionPreference: false
+  };
+  return AlpineAnimation;
+};
+var src_default = AlpineAnimation;
 
 // builds/module.js
 var module_default = src_default;
