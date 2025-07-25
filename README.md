@@ -171,17 +171,10 @@ or you can somthings like this
     <li>item three</li>
 </ul>
 ```
-## For Contributors:
-
-I believe I will handle these tasks myself as soon as possible, but your contributions can help improve the Alpine Animation plugin quickly. Contributions are welcome in the following areas:
 
 1. **Global Configurations**: Implement global configuration options to allow users to set default animation settings across the entire application.
 
-2. **Comprehensive Examples**: Expand the documentation with comprehensive examples covering various use cases, edge cases, and advanced scenarios.
-
-3. **Conditional Enabling/Disabling**: Add support for conditional enabling or disabling of the plugin based on runtime conditions or user preferences.
-
-4. **Code Refactoring**: Refactor existing code to improve readability, maintainability, or to adhere to best practices.
+2. **Conditional Enabling/Disabling**: Add support for conditional enabling or disabling of the plugin based on runtime conditions or user preferences.
 
 
 ## Versioning
