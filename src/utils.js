@@ -1,13 +1,19 @@
 export function parseModifier(modifiers) {
-    let duration = 300, easing, disrespectUserMotionPreference = false;
-    
+    let
+        duration = 300,
+        easing = 'ease-in-out',
+        disrespectUserMotionPreference = false;
+
     if (modifiers.includes('duration')) {
         const durationIndex = modifiers.indexOf('duration');
         const durationValue = modifiers[durationIndex + 1];
         const durationRegex = /^(\d+)(ms|s)?$/;
 
-        console.log(durationRegex.test(durationValue))
-        if (durationRegex.test(durationValue)) {
+        // console.log(durationRegex.test(durationValue))
+
+        if (!durationRegex.test(durationValue)) {
+            console.warn('The \'duration\' modifier was specified without a valid value.')
+        } else {
             const match = durationRegex.exec(durationValue);
             const durationNumber = parseInt(match[1], 10);
 
@@ -23,9 +29,7 @@ export function parseModifier(modifiers) {
         const easingValue = modifiers[modifiers.indexOf('easing') + 1];
         easingValue
             ? (easing = easingValue)
-            : console.warn(
-                'The \'easing\' modifier was specified without a value.'
-            );
+            : console.warn('The \'easing\' modifier was specified without a value.');
     }
     //  handling the disrespectUserMotionPreference modifier
     if (modifiers.includes('disrespectusermotionpreference')) {

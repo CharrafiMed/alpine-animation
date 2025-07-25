@@ -477,8 +477,9 @@
       const durationIndex = modifiers.indexOf("duration");
       const durationValue = modifiers[durationIndex + 1];
       const durationRegex = /^(\d+)(ms|s)?$/;
-      console.log(durationRegex.test(durationValue));
-      if (durationRegex.test(durationValue)) {
+      if (!durationRegex.test(durationValue)) {
+        console.warn("The 'duration' modifier was specified without a valid value.");
+      } else {
         const match = durationRegex.exec(durationValue);
         const durationNumber = parseInt(match[1], 10);
         const durationUnit = match[2] || "ms";
@@ -501,17 +502,17 @@
   }
 
   // src/index.js
-  config = {};
+  var config = {};
   var src_default = (Alpine) => {
     Alpine.directive("animate", (el, {modifiers, expression}, {evaluate}) => {
-      let config2 = parseModifier(modifiers);
+      config = parseModifier(modifiers);
       if (expression?.length) {
         const evaluated = evaluate(expression);
         if (typeof evaluated === "object" && evaluated !== null) {
-          config2 = {...config2, ...evaluated};
+          config = {...config, ...evaluated};
         }
       }
-      autoAnimate(el, config2);
+      autoAnimate(el, config);
     });
   };
 
