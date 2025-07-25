@@ -1,188 +1,316 @@
-﻿# Alpine Animation
-Alpine's animation plugin allows you to easily add animations when an element is added, removed, or changed in the DOM.
+﻿# Alpine Animation Plugin
 
+A seamless Alpine.js plugin that brings smooth animations to your DOM changes using the powerful [AutoAnimate](https://auto-animate.formkit.com/) library under the hood.
 
-This package is useful for things like adding or removing items from tables or any components that deal with list shuffling, etc.  
+Perfect for animating list changes, table updates, card shuffles, and any dynamic content that gets added, removed, or reordered.
 
+## ✨ Features
 
-The plugin seamlessly integrates the  [AutoAnimate](https://auto-animate.formkit.com/)  library for effortless animations.
+- **Zero Configuration** - Works out of the box with sensible defaults
+- **Multiple Configuration Methods** - Use modifiers, objects, or global settings
+- **Global Configuration** - Set defaults for your entire application
+- **Method Chaining** - Fluent API for easy setup
+- **TypeScript Ready** - Full type support (when available)
+- **Lightweight** - Minimal overhead, maximum performance
 
-## Installation 
-
-For now, you can use this plugin by installing it via NPM.
+## 📦 Installation
 
 ### Via CDN
-You can include the CDN build of this plugin as a `<script>` tag, make sure to include it BEFORE Alpine's core JS file.
 
-```alpine
-<!-- Alpine Plugin -->
-    <script src="https://cdn.jsdelivr.net/npm/@charrafimed/alpine-animation@0.1.0/dist/cdn.min.js" defer></script>
+Include the plugin **before** Alpine's core JS file:
 
+```html
+<!-- Alpine Animation Plugin -->
+<script src="https://cdn.jsdelivr.net/npm/@charrafimed/alpine-animation@latest/dist/cdn.min.js" defer></script>
 
 <!-- Alpine Core -->
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 ```
 
 ### Via NPM
-You can install Alpine Animation from NPM for use inside your bundle like so:
 
-
-```shell
+```bash
 npm install @charrafimed/alpine-animation
 ```
 
-Then initialize it from your bundle:
+Then register the plugin:
 
-```js
+```javascript
 import Alpine from 'alpinejs'
-import Animate from '@charrafimed/alpine-animation'
+import AlpineAnimation from '@charrafimed/alpine-animation'
 
-Alpine.plugin(Animate)
+// Optional: Configure global defaults
+AlpineAnimation.customize({ 
+  duration: 400, 
+  easing: 'ease-out' 
+})
 
-...
-
+Alpine.plugin(AlpineAnimation)
 Alpine.start()
-
-```
-## basic usage 
-
-Using the animation plugin is a breeze. Just add one directive and let the plugin do its work.
-
-```html
-<ul x-data x-animate>
-    <li>item one</li>
-    <li>item two </li>
-    <li>item three</li>
-</ul>
 ```
 
+## 🚀 Quick Start
 
-Now, each time an item is added to the list, removed from it, or even shuffled, the animation will apply.
-
-## Customization Options
-You can customize the animations using the following modifiers or even pass an dedicated object as the  [AutoAnimate](https://auto-animate.formkit.com/#usage) provide.
-
-### duration 
-You can customize the duration of the animation period using the duration modifier or by passing a plain object. Here are the options: 
-#### Using the Modifier
+Add the `x-animate` directive to any container, and watch the magic happen:
 
 ```html
-<ul x-data x-animate.duration.300ms>
-    <li>item one</li>
-    <li>item two </li>
-    <li>item three</li>
-</ul>
+<div x-data="{ items: ['Apple', 'Banana', 'Cherry'] }" x-animate>
+  <template x-for="item in items">
+    <div x-text="item" x-on:click="items.splice(items.indexOf(item), 1)"></div>
+  </template>
+  <button x-on:click="items.push('New Item')">Add Item</button>
+</div>
 ```
-In this example, the animation will occur over 300 milliseconds.
-> **Notice:** If the unit is milliseconds (ms), you can omit the ms and just provide the number:
+
+**That's it!** Items will now animate smoothly when added, removed, or reordered.
+
+## ⚙️ Configuration Options
+
+### Using Modifiers
+
+Chain modifiers directly on the directive:
+
 ```html
-<ul x-data x-animate.duration.300>
-    <li>item one</li>
-    <li>item two </li>
-    <li>item three</li>
-</ul>
+<!-- Custom duration -->
+<div x-animate.duration.600ms>...</div>
+<div x-animate.duration.1s>...</div>
+<div x-animate.duration.300>...</div> <!-- defaults to ms -->
+
+<!-- Custom easing -->
+<div x-animate.easing.ease-in-out>...</div>
+<div x-animate.easing.linear>...</div>
+
+<!-- Ignore user motion preferences -->
+<div x-animate.disrespectusermotionpreference.true>...</div>
+
+<!-- Combine multiple modifiers -->
+<div x-animate.duration.500ms.easing.ease-out.disrespectusermotionpreference.true>
+  <!-- Your animated content -->
+</div>
 ```
-The duration modifier also supports seconds (s):
+
+### Using Object Configuration
+
+For more complex configurations, pass a JavaScript object:
 
 ```html
-<ul x-data x-animate.duration.1s>
-    <li>item one</li>
-    <li>item two </li>
-    <li>item three</li>
-</ul>
-```
-#### Using a Plain Object 
-You can pass the duration as a plain object like this:
-```html
-<ul x-data x-animate="{duration:3000}">
-    <li>item one</li>
-    <li>item two </li>
-    <li>item three</li>
-</ul>
-```
-> **Notice:**  When using the object syntax, the duration is always considered to be in milliseconds, so you don't need to specify the unit.
-
-### easing
-Specify the easing function for the animation.
-#### Using the modifier 
-
-```html
-<ul x-data x-animate.easing.ease-in-out>
-    <li>item one</li>
-    <li>item two</li>
-    <li>item three</li>
-</ul>
-``` 
-
-#### Using a Plain Object 
-You can pass the easing as a plain object like this:
-```html
-<ul x-data x-animate="{ easing: 'ease-in-out' }">
-    <li>item one</li>
-    <li>item two</li>
-    <li>item three</li>
-</ul>
-```
-### Disrespect User Motion Preference
-By default, the animation respects the user's motion preferences. You can override this behavior using the disrespectusermotionpreference modifier or within the object passed to the plugin.
-#### using the modifier 
-
-```html
-<ul x-data x-animate.disrespectusermotionpreference.true>
-    <li>item one</li>
-    <li>item two</li>
-    <li>item three</li>
-</ul>
-```
-#### Using a Plain Object :
-```html
-<ul x-data x-animate="{ disrespectUserMotionPreference: true }">
-    <li>item one</li>
-    <li>item two</li>
-    <li>item three</li>
-</ul>
-
-``` 
-
-### Combined options 
-
-Modifiers can be combined by applying them sequentially, where each modifier key is followed by its value.
-```html
-<ul x-data x-animate.duration.300.easing.ease-in-out.disrespectusermotionpreference.true>
-    <li>item one</li>
-    <li>item two</li>
-    <li>item three</li>
-</ul>
-```
-In this example, the animation will have a duration of 300 milliseconds, use the easing function ease-in-out, and disrespect the user's motion preferences.
-or you can somthings like this 
-```html
-<ul x-data x-animate="{
-  // Animation duration in milliseconds (default: 250)
-  duration: 450,
-  // Easing for motion (default: 'ease-in-out')
-  easing: 'linear'
-  // When true, this will enable animations even if the user has indicated
-  // they don’t want them via prefers-reduced-motion.
-  disrespectUserMotionPreference: false
+<div x-animate="{ 
+  duration: 600, 
+  easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  disrespectUserMotionPreference: false 
 }">
-    <li>item one</li>
-    <li>item two</li>
-    <li>item three</li>
-</ul>
+  <!-- Your content -->
+</div>
 ```
 
-1. **Global Configurations**: Implement global configuration options to allow users to set default animation settings across the entire application.
+### Conditional Animation
 
-2. **Conditional Enabling/Disabling**: Add support for conditional enabling or disabling of the plugin based on runtime conditions or user preferences.
+Disable animations conditionally:
+
+```html
+<div x-data="{ animate: true }" x-animate="animate">
+  <!-- Animation only runs when animate is true -->
+</div>
+
+<!-- Or disable completely -->
+<div x-animate="false">
+  <!-- No animation -->
+</div>
+```
+
+## 🌐 Global Configuration
+
+Set default configuration for all animations in your application:
+
+### Basic Global Setup
+
+```javascript
+import AlpineAnimation from '@charrafimed/alpine-animation'
+
+// Configure before registering with Alpine
+AlpineAnimation.customize({
+  duration: 400,
+  easing: 'ease-out',
+  disrespectUserMotionPreference: false
+})
+
+Alpine.plugin(AlpineAnimation)
+```
+
+### Available Global Methods
+
+```javascript
+// Set global defaults
+AlpineAnimation.customize({ duration: 500 })
+
+// Method chaining
+AlpineAnimation
+  .customize({ duration: 300 })
+  .customize({ easing: 'linear' })
+
+// Get current global configuration
+const config = AlpineAnimation.getConfig()
+console.log(config) // { duration: 300, easing: 'linear', ... }
+
+// Reset to original defaults
+AlpineAnimation.reset()
+```
+
+### Configuration Priority
+
+Settings are applied in this order (highest to lowest priority):
+
+1. **Object expression**: `x-animate="{ duration: 1000 }"`
+2. **Modifiers**: `x-animate.duration.500ms`
+3. **Global configuration**: `AlpineAnimation.customize()`
+4. **Default values**: Built-in defaults
+
+## 📋 Configuration Reference
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `duration` | `number` | `300` | Animation duration in milliseconds |
+| `easing` | `string` | `'ease-in-out'` | CSS easing function |
+| `disrespectUserMotionPreference` | `boolean` | `false` | Ignore `prefers-reduced-motion` setting |
+
+### Easing Options
+
+Common easing values you can use:
+
+- `'linear'` - Constant speed
+- `'ease'` - Slow start, fast middle, slow end
+- `'ease-in'` - Slow start
+- `'ease-out'` - Slow end  
+- `'ease-in-out'` - Slow start and end
+- `'cubic-bezier(0.4, 0, 0.2, 1)'` - Custom cubic bezier
+
+## 💡 Usage Examples
+
+### Todo List
+
+```html
+<div x-data="{ 
+  todos: ['Learn Alpine.js', 'Build something cool'],
+  newTodo: ''
+}" x-animate.duration.300ms>
+  
+  <template x-for="(todo, index) in todos" :key="todo">
+    <div class="todo-item" x-on:click="todos.splice(index, 1)">
+      <span x-text="todo"></span>
+      <button>×</button>
+    </div>
+  </template>
+  
+  <form x-on:submit.prevent="todos.push(newTodo); newTodo = ''">
+    <input x-model="newTodo" placeholder="Add todo...">
+    <button type="submit">Add</button>
+  </form>
+</div>
+```
 
 
-## Versioning
+### Table Rows
 
-This projects follow the [Semantic Versioning](https://semver.org/) guidelines.
+```html
+<table x-data="{ 
+  users: [
+    { id: 1, name: 'John', email: 'john@example.com' },
+    { id: 2, name: 'Jane', email: 'jane@example.com' }
+  ]
+}">
+  <tbody x-animate.duration.400ms>
+    <template x-for="user in users" :key="user.id">
+      <tr>
+        <td x-text="user.name"></td>
+        <td x-text="user.email"></td>
+        <td>
+          <button x-on:click="users = users.filter(u => u.id !== user.id)">
+            Delete
+          </button>
+        </td>
+      </tr>
+    </template>
+  </tbody>
+</table>
+```
 
-## License
+## 🎛️ Advanced Usage
 
-Copyright (c) Charrafi Mohamed
+### Multiple Animation Containers
 
-Licensed under the MIT license, see [LICENSE.md](LICENSE.md) for details.
+```html
+<div x-data="{ fastItems: [], slowItems: [] }">
+  <!-- Fast animations -->
+  <div x-animate.duration.150ms>
+    <template x-for="item in fastItems">
+      <div x-text="item"></div>
+    </template>
+  </div>
+  
+  <!-- Slow animations -->
+  <div x-animate.duration.800ms.easing.ease-in-out>
+    <template x-for="item in slowItems">
+      <div x-text="item"></div>
+    </template>
+  </div>
+</div>
+```
+
+### Responsive Animation Settings
+
+```html
+<div x-data="{ isMobile: window.innerWidth < 768 }" 
+     x-animate="{ 
+       duration: isMobile ? 200 : 400,
+       easing: isMobile ? 'ease' : 'ease-in-out'
+     }">
+  <!-- Content adapts animation to screen size -->
+</div>
+```
+
+### Theme-Based Configuration
+
+```javascript
+// Set up different themes
+const themes = {
+  fast: { duration: 150, easing: 'ease' },
+  smooth: { duration: 400, easing: 'ease-in-out' },
+  slow: { duration: 800, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' }
+}
+
+// Apply theme
+AlpineAnimation.customize(themes.smooth)
+```
+
+## 🐛 Troubleshooting
+
+### Common Gotchas
+
+```html
+<!-- ❌ Won't work - animate the container, not individual items -->
+<div x-for="item in items">
+  <div x-animate>{{ item }}</div>
+</div>
+
+<!-- ✅ Correct - animate the parent container -->
+<div x-animate>
+  <div x-for="item in items">
+    <div>{{ item }}</div>
+  </div>
+</div>
+```
+
+## 🤝 Contributing
+
+Found a bug or have a feature request? We'd love to hear from you!
+
+- **Issues**: [GitHub Issues](https://github.com/charrafimed/alpine-animation/issues)
+- **Pull Requests**: [GitHub PRs](https://github.com/charrafimed/alpine-animation/pulls)
+
+## 📄 License
+
+MIT License - see [LICENSE.md](LICENSE.md) for details.
+
+---
+
+**Built with ❤️ for the Alpine.js community**

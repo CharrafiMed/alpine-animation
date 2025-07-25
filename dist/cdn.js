@@ -242,8 +242,8 @@
       return pluginReturn;
     return [pluginReturn];
   }
-  function isPlugin(config2) {
-    return typeof config2 === "function";
+  function isPlugin(config) {
+    return typeof config === "function";
   }
   function remain(el) {
     const oldCoords = coords.get(el);
@@ -439,20 +439,20 @@
     const left = Math.round(oldCoords.left - parentCoords.left) - raw(parentStyles.borderLeftWidth);
     return [top, left, width, height];
   }
-  function autoAnimate(el, config2 = {}) {
+  function autoAnimate(el, config = {}) {
     if (mutations && resize) {
       const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-      const isDisabledDueToReduceMotion = mediaQuery.matches && !isPlugin(config2) && !config2.disrespectUserMotionPreference;
+      const isDisabledDueToReduceMotion = mediaQuery.matches && !isPlugin(config) && !config.disrespectUserMotionPreference;
       if (!isDisabledDueToReduceMotion) {
         enabled.add(el);
         if (getComputedStyle(el).position === "static") {
           Object.assign(el.style, {position: "relative"});
         }
         forEach(el, updatePos, poll, (element) => resize === null || resize === void 0 ? void 0 : resize.observe(element));
-        if (isPlugin(config2)) {
-          options.set(el, config2);
+        if (isPlugin(config)) {
+          options.set(el, config);
         } else {
-          options.set(el, {duration: 250, easing: "ease-in-out", ...config2});
+          options.set(el, {duration: 250, easing: "ease-in-out", ...config});
         }
         mutations.observe(el, {childList: true});
         parents.add(el);
@@ -472,7 +472,7 @@
 
   // src/utils.js
   function parseModifier(modifiers) {
-    let duration = 300, easing, disrespectUserMotionPreference = false;
+    let duration = 300, easing = "ease-in-out", disrespectUserMotionPreference = false;
     if (modifiers.includes("duration")) {
       const durationIndex = modifiers.indexOf("duration");
       const durationValue = modifiers[durationIndex + 1];
@@ -502,19 +502,76 @@
   }
 
   // src/index.js
-  var config = {};
-  var src_default = (Alpine) => {
-    Alpine.directive("animate", (el, {modifiers, expression}, {evaluate}) => {
-      config = parseModifier(modifiers);
-      if (expression?.length) {
-        const evaluated = evaluate(expression);
-        if (typeof evaluated === "object" && evaluated !== null) {
-          config = {...config, ...evaluated};
-        }
-      }
-      autoAnimate(el, config);
-    });
+  var globalConfig = {
+    duration: 300,
+    easing: "ease-in-out",
+    disrespectUserMotionPreference: false
   };
+  function AlpineAnimation(Alpine) {
+    Alpine.directive("animate", (el, {modifiers, expression}, {evaluate, cleanup}) => {
+      try {
+        let config = {...globalConfig};
+        const modifierConfig = parseModifier(modifiers);
+        config = {...config, ...modifierConfig};
+        if (expression?.length) {
+          const evaluated = evaluate(expression);
+          if (typeof evaluated === "object" && evaluated !== null) {
+            config = {...config, ...evaluated};
+          } else if (evaluated === false) {
+            return;
+          }
+        }
+        console.log("hiba");
+        const autoAnimateInstance = autoAnimate(el, config);
+      } catch (error) {
+        console.error("[Alpine Animation] Failed to initialize:", error);
+      }
+    });
+  }
+  AlpineAnimation.customize = function(userConfig) {
+    if (typeof userConfig !== "object" || userConfig === null) {
+      console.warn("[Alpine Animation] customize() expects an object");
+      return AlpineAnimation;
+    }
+    const validKeys = ["duration", "easing", "disrespectUserMotionPreference"];
+    const validConfig = {};
+    Object.keys(userConfig).forEach((key) => {
+      if (validKeys.includes(key)) {
+        validConfig[key] = userConfig[key];
+      } else {
+        console.warn(`[Alpine Animation] Unknown configuration key: "${key}"`);
+      }
+    });
+    if (validConfig.duration !== void 0) {
+      if (typeof validConfig.duration !== "number" || validConfig.duration < 0) {
+        console.warn("[Alpine Animation] duration must be a non-negative number");
+        delete validConfig.duration;
+      }
+    }
+    if (validConfig.easing !== void 0) {
+      if (typeof validConfig.easing !== "string") {
+        console.warn("[Alpine Animation] easing must be a string");
+        delete validConfig.easing;
+      }
+    }
+    if (validConfig.disrespectUserMotionPreference !== void 0) {
+      validConfig.disrespectUserMotionPreference = Boolean(validConfig.disrespectUserMotionPreference);
+    }
+    globalConfig = {...globalConfig, ...validConfig};
+    return AlpineAnimation;
+  };
+  AlpineAnimation.getConfig = function() {
+    return {...globalConfig};
+  };
+  AlpineAnimation.reset = function() {
+    globalConfig = {
+      duration: 300,
+      easing: "ease-in-out",
+      disrespectUserMotionPreference: false
+    };
+    return AlpineAnimation;
+  };
+  var src_default = AlpineAnimation;
 
   // builds/cdn.js
   document.addEventListener("alpine:initializing", () => {
