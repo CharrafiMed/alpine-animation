@@ -1,41 +1,41 @@
 export function parseModifier(modifiers) {
-    if (modifiers.includes("duration")) {
-        
-        const durationIndex = modifiers.indexOf("duration");
+    let duration = 300, easing, disrespectUserMotionPreference = false;
+    
+    if (modifiers.includes('duration')) {
+        const durationIndex = modifiers.indexOf('duration');
         const durationValue = modifiers[durationIndex + 1];
         const durationRegex = /^(\d+)(ms|s)?$/;
 
+        console.log(durationRegex.test(durationValue))
         if (durationRegex.test(durationValue)) {
             const match = durationRegex.exec(durationValue);
             const durationNumber = parseInt(match[1], 10);
 
-            // Default to "ms" if unit is empty
-            const durationUnit = match[2] || "ms";
+            // Default to 'ms' if unit is empty
+            const durationUnit = match[2] || 'ms';
 
-            configs.duration =
-                durationUnit === "s" ? durationNumber * 1000 : durationNumber;
-        } else {
-            console.warn(
-                "Invalid duration format. Use digits followed by 'ms' or 's'."
-            );
+            duration = durationUnit === 's' ? durationNumber * 1000 : durationNumber;
         }
     }
 
     // handling the easing modifier
-    if (modifiers.includes("easing")) {
-        const easingValue = modifiers[modifiers.indexOf("easing") + 1];
+    if (modifiers.includes('easing')) {
+        const easingValue = modifiers[modifiers.indexOf('easing') + 1];
         easingValue
-            ? (configs.easing = easingValue)
+            ? (easing = easingValue)
             : console.warn(
-                'The "easing" modifier was specified without a value.'
+                'The \'easing\' modifier was specified without a value.'
             );
     }
     //  handling the disrespectUserMotionPreference modifier
-    if (modifiers.includes("disrespectusermotionpreference")) {
+    if (modifiers.includes('disrespectusermotionpreference')) {
         const userMotionPrefValue =
-            modifiers[modifiers.indexOf("disrespectusermotionpreference") + 1];
-        configs.disrespectUserMotionPreference = userMotionPrefValue
+            modifiers[modifiers.indexOf('disrespectusermotionpreference') + 1];
+        disrespectUserMotionPreference = userMotionPrefValue
             ? true
             : false;
+    }
+    return {
+        duration, easing, disrespectUserMotionPreference
     }
 }

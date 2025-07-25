@@ -254,8 +254,8 @@ function getPluginTuple(pluginReturn) {
     return pluginReturn;
   return [pluginReturn];
 }
-function isPlugin(config) {
-  return typeof config === "function";
+function isPlugin(config2) {
+  return typeof config2 === "function";
 }
 function remain(el) {
   const oldCoords = coords.get(el);
@@ -451,20 +451,20 @@ function deletePosition(el) {
   const left = Math.round(oldCoords.left - parentCoords.left) - raw(parentStyles.borderLeftWidth);
   return [top, left, width, height];
 }
-function autoAnimate(el, config = {}) {
+function autoAnimate(el, config2 = {}) {
   if (mutations && resize) {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const isDisabledDueToReduceMotion = mediaQuery.matches && !isPlugin(config) && !config.disrespectUserMotionPreference;
+    const isDisabledDueToReduceMotion = mediaQuery.matches && !isPlugin(config2) && !config2.disrespectUserMotionPreference;
     if (!isDisabledDueToReduceMotion) {
       enabled.add(el);
       if (getComputedStyle(el).position === "static") {
         Object.assign(el.style, {position: "relative"});
       }
       forEach(el, updatePos, poll, (element) => resize === null || resize === void 0 ? void 0 : resize.observe(element));
-      if (isPlugin(config)) {
-        options.set(el, config);
+      if (isPlugin(config2)) {
+        options.set(el, config2);
       } else {
-        options.set(el, {duration: 250, easing: "ease-in-out", ...config});
+        options.set(el, {duration: 250, easing: "ease-in-out", ...config2});
       }
       mutations.observe(el, {childList: true});
       parents.add(el);
@@ -482,35 +482,48 @@ function autoAnimate(el, config = {}) {
   });
 }
 
+// src/utils.js
+function parseModifier(modifiers) {
+  let duration = 300, easing, disrespectUserMotionPreference = false;
+  if (modifiers.includes("duration")) {
+    const durationIndex = modifiers.indexOf("duration");
+    const durationValue = modifiers[durationIndex + 1];
+    const durationRegex = /^(\d+)(ms|s)?$/;
+    console.log(durationRegex.test(durationValue));
+    if (durationRegex.test(durationValue)) {
+      const match = durationRegex.exec(durationValue);
+      const durationNumber = parseInt(match[1], 10);
+      const durationUnit = match[2] || "ms";
+      duration = durationUnit === "s" ? durationNumber * 1e3 : durationNumber;
+    }
+  }
+  if (modifiers.includes("easing")) {
+    const easingValue = modifiers[modifiers.indexOf("easing") + 1];
+    easingValue ? easing = easingValue : console.warn("The 'easing' modifier was specified without a value.");
+  }
+  if (modifiers.includes("disrespectusermotionpreference")) {
+    const userMotionPrefValue = modifiers[modifiers.indexOf("disrespectusermotionpreference") + 1];
+    disrespectUserMotionPreference = userMotionPrefValue ? true : false;
+  }
+  return {
+    duration,
+    easing,
+    disrespectUserMotionPreference
+  };
+}
+
 // src/index.js
+config = {};
 var src_default = (Alpine) => {
-  Alpine.directive("animate", (el, {value, modifiers, expression}, {Alpine: Alpine2, effect, evaluate, evaluateLater, cleanup}) => {
-    let configs = {};
-    if (modifiers.includes("duration")) {
-      const durationIndex = modifiers.indexOf("duration");
-      const durationValue = modifiers[durationIndex + 1];
-      const durationRegex = /^(\d+)(ms|s)?$/;
-      if (durationRegex.test(durationValue)) {
-        const match = durationRegex.exec(durationValue);
-        const durationNumber = parseInt(match[1], 10);
-        const durationUnit = match[2] || "ms";
-        configs.duration = durationUnit === "s" ? durationNumber * 1e3 : durationNumber;
-      } else {
-        console.warn("Invalid duration format. Use digits followed by 'ms' or 's'.");
+  Alpine.directive("animate", (el, {modifiers, expression}, {evaluate}) => {
+    let config2 = parseModifier(modifiers);
+    if (expression == null ? void 0 : expression.length) {
+      const evaluated = evaluate(expression);
+      if (typeof evaluated === "object" && evaluated !== null) {
+        config2 = {...config2, ...evaluated};
       }
     }
-    if (modifiers.includes("easing")) {
-      const easingValue = modifiers[modifiers.indexOf("easing") + 1];
-      easingValue ? configs.easing = easingValue : console.warn('The "easing" modifier was specified without a value.');
-    }
-    if (modifiers.includes("disrespectusermotionpreference")) {
-      const userMotionPrefValue = modifiers[modifiers.indexOf("disrespectusermotionpreference") + 1];
-      configs.disrespectUserMotionPreference = userMotionPrefValue ? true : false;
-    }
-    if (String(expression).length) {
-      configs = {...configs, ...evaluate(expression)};
-    }
-    autoAnimate(el, configs);
+    autoAnimate(el, config2);
   });
 };
 

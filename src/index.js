@@ -1,17 +1,19 @@
-import autoAnimate from "@formkit/auto-animate";
-import { parseModifier } from "./utils";
+import autoAnimate from '@formkit/auto-animate';
+import { parseModifier } from './utils';
+
+config = {};
 
 export default (Alpine) => {
-  Alpine.directive("animate", (el, { value, modifiers, expression }, { Alpine, effect, evaluate, evaluateLater, cleanup }) => {
-    let configs = {};
-    // handling the duration modifier
-    console.log(modifiers);
+  Alpine.directive('animate', (el, { modifiers, expression }, { evaluate }) => {
 
-    if (String(expression).length) {
-      configs = { ...configs, ...evaluate(expression) };
+    let config = parseModifier(modifiers);
+
+    if (expression?.length) {
+      const evaluated = evaluate(expression);
+      if (typeof evaluated === 'object' && evaluated !== null) {
+        config = { ...config, ...evaluated };
+      }
     }
-
-    autoAnimate(el, configs);
-  }
-  );
+    autoAnimate(el, config);
+  });
 };
